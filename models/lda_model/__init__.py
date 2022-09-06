@@ -4,6 +4,7 @@ from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 import string
 from dagster import job, op, get_dagster_logger
+from local_build.sandbox.ocr.ocr_analysis import image_read
 
 
 stop = set(stopwords.words('english'))
@@ -20,7 +21,10 @@ doc4 = "Sometimes I feel pressure to perform well at school, but " \
        "my father never seems to drive my sister to do better."
 doc5 = "Health experts say that Sugar is not good for your lifestyle."
 
-all_doc = [doc1, doc2, doc3, doc4, doc5]
+doc6 = image_read("C:\\Users\\002CSC744\\Documents\\My_Projects\\"
+                  "JText-classifier_main\\image\\12578\\Page_17.jpg")
+
+all_doc = [doc1, doc2, doc3, doc4, doc5, doc6]
 
 print('Type of all_doc:\t{}, \nall_model '
       'contents of :\t{}'.format(type(all_doc), all_doc))

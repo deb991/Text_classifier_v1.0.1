@@ -32,5 +32,19 @@ dagit -f .\models\lda_model\__init__.py
        
 ```
 
-To materialize previous step need to followed. 
+To materialize previous step need to follow. 
+
+<h3>OCR Integration</h3>
+* As of now Hard coded Pytessaract path into the script. 
+
+
+``ocr.pytesseract.tesseract_cmd = \
+    'C:\\Tesseract-OCR\\tesseract.exe'``
+
+<br>Next update, will integrate more logi & more versatile for use.</br>
+
+* To test on LDA model, 
+
+
+  ``JText-classifier_main/models/lda_model/__init__.py``
 
