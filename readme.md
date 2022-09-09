@@ -41,7 +41,16 @@ To materialize previous step need to follow.
 ``ocr.pytesseract.tesseract_cmd = \
     'C:\\Tesseract-OCR\\tesseract.exe'``
 
-<br>Next update, will integrate more logi & more versatile for use.</br>
+* Added features -- OCR Analyzer :
+    * Added ``cv2.imshow("Thresold_Image", threshed)``
+      First param is "Window Name", 
+      Second one is the "processed data". 
+    * Usually CV2 mostly accepts Numpy array Data. So better we pass it, without use "try" block. 
+    * OCR Analyzer only for test purpose 
+
+<br>Next Changes target: 
+  1. Pass data from OCR to model & analyze data. 
+  2. Add NB along with LDA model. </br>
 
 * To test on LDA model, 
 

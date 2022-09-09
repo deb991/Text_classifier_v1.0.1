@@ -24,35 +24,30 @@ doc5 = "Health experts say that Sugar is not good for your lifestyle."
 doc6 = image_read("C:\\Users\\002CSC744\\Documents\\My_Projects\\"
                   "JText-classifier_main\\image\\12578\\Page_17.jpg")
 
-all_doc = [doc1, doc2, doc3, doc4, doc5, doc6]
+#all_doc = [doc1, doc2, doc3, doc4, doc5, doc6]
+all_doc = [doc6]
 
-print('Type of all_doc:\t{}, \nall_model '
-      'contents of :\t{}'.format(type(all_doc), all_doc))
 
-@op
 def clean(doc):
     stop_word_removal = "".join(
-        [i for i in doc.lower().split() if i not in stop])
+        [i for i in str(doc).lower().split() if i not in stop])
     punctuation_removal = "".join(
         ch for ch in stop_word_removal if ch not in exclude)
     normalize = "".join(
         lemma.lemmatize(word) for word in punctuation_removal.split())
-    # print("Stop_word_removal:\t{}, \nPunctuation_removal:\t{},
-    # \nNormalize:\t".format(stop_word_removal, punctuation_removal, normalize))
+    print(f"Stop_word_removal:\t{stop_word_removal}, "
+          f"\nPunctuation_removal:\t{punctuation_removal},\nNormalize:\t")
 
     return normalize
 
 
-@op(
 
-)
 def get_doc_clean(arg):
     doc_clean = [arg(doc).split() for doc in all_doc]
 
     return doc_clean
 
 
-@op
 def get_term_dictionary(arg):
     # Creating the term dictionary of our corpus, where every
     # unique term is assign to an index
@@ -61,7 +56,6 @@ def get_term_dictionary(arg):
     return term_dict
 
 
-@op
 def get_doc_term_matrix(arg1, arg2):
     # converting list of documents(corpus) into Document term matrix
     # using Dictionary prepared above
@@ -70,7 +64,6 @@ def get_doc_term_matrix(arg1, arg2):
     return doc_term_matrix
 
 
-@op
 def get_lda_model_output(arg1, arg2):
     # print('Test--1, \nterm_dict:\t{},
     # \ndoc_term_matrix:\t{}'.format(term_dict, doc_term_matrix))
@@ -82,21 +75,20 @@ def get_lda_model_output(arg1, arg2):
 
     # Running & Training LDA model on the document term matrix
     lda_model = Lda(arg1, num_topics=3, id2word=arg2, passes=50)
+    print('Test--2: \nLDA_Model:\t',
+          lda_model.print_topics(num_topics=3, num_words=3))
 
     return lda_model
 
 
-@job
-def get_materealize():
-    #clean()
-    #get_doc_clean(clean())
-    #get_term_dictionary()
-    #get_doc_term_matrix()
-    get_lda_model_output(
-        get_doc_term_matrix(get_term_dictionary(
-            get_doc_clean(clean())),
-                            get_doc_clean(clean())),
-        get_term_dictionary(get_doc_clean(clean())))
+# def get_materealize():
+#     get_lda_model_output(
+#         get_doc_term_matrix(get_term_dictionary(
+#             get_doc_clean(clean())),
+#                             get_doc_clean(clean())),
+#         get_term_dictionary(get_doc_clean(clean())))
 
-#print('Test--2: \nLDA_Model:\t',
-#      lda_model.print_topics(num_topics=3, num_words=3))
+if __name__ == '__main__':
+    clean(all_doc)
+    #get_materealize()
+
