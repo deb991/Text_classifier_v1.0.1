@@ -30,10 +30,13 @@ def image_read(image):
 
 
 def lang_classifier(arg1):
-    if arg1 == 'english':
-        return 'eng'
-    elif arg1 == 'Bengali':
-        return 'ben'
+    try:
+        if arg1 == 'english':
+            return 'eng'
+        elif arg1 == 'Bengali':
+            return 'ben'
+    except:
+        print('Language detectection not happen!!')
 
 
 def image_read_lang(image):
@@ -45,7 +48,7 @@ def image_read_lang(image):
     im = enhancer.enhance(2)
     im = im.convert('1')
     text = ocr.image_to_string(Image.open(image), lang=get_lang)
-    print('Text:\t', text)
+    print('Text_check:\t', text)
     return text
 
 
@@ -83,7 +86,7 @@ def get_thresholding(image):
     #return threshed
 
 
-def get_dialation(image):
+def get_dialation_img(image):
     kernel = np.ones((5, 5), np.uint8)
     return cv2.dilate(np_array_img(image), kernel, iterations=1)
 
