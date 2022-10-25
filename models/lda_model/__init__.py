@@ -14,25 +14,37 @@ import pyLDAvis.gensim_models
 import matplotlib.pyplot as plt
 #%matplotlib inline
 from spacy.cli.download import download
+import logging
 download(model="en_core_web_sm")
 
 from data_extract import output_format
 from local_build.sandbox.ocr import ocr_analysis
+from component.config_parsar import read_config
 
 # NLTK Stop words
 from nltk.corpus import stopwords
 stop_words = stopwords.words('english')
 stop_words.extend(['from', 'subject', 're', 'edu', 'use'])
 
-#df = pd.read_json("C:\\Users\\002CSC744\\Documents\\My_Projects"
-#                  "\\JText-classifier_main\\res\\newsgroups.json")
+log_file = (read_config())
 
-img_extract = pd.read_json(output_format(ocr_analysis.image_read_lang(
-    "C:\\Users\\002CSC744\\Downloads\\pdf_use_case"
-    "\\photo_6109267155661992742_y.jpg"
-)))
-print('img_extract:\t', img_extract)
-df = output_format(img_extract)
+print('log file:\t', log_file)
+logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG)
+                    #format='%(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+logger.info("log file validated !!")
+
+
+def img_data():
+    text_img = ocr_analysis.image_read_lang("C:\\Users\\002CSC744\\Downloads\\pdf_use_case\\photo_6109267155661992742_y.jpg")
+
+    print("text_image:\t", text_img)
+    return pd.read_json(output_format(text_img))
+
+#print('img_extract:\t', img_extract)
+df = pd.read_json("C:\\Users\\002CSC744\\Documents\\My_Projects"
+                  "\\JText-classifier_main\\res\\newsgroups.json")
+#df = output_format(img_extract)
 print(df.target_names.unique())
 df.head()
 
@@ -46,14 +58,18 @@ data = [re.sub('\s+', ' ', sent) for sent in data]
 data = [re.sub("\'", "", sent) for sent in data]
 pprint(data[:1])
 
+
 def sent_to_words(sentences):
-  for sentence in sentences:
-    yield(gensim.utils.simple_preprocess
-          (str(sentence), deacc=True))  #deacc=True removes punctuations
+    logger.info('Sent to words initiated .')
+    for sentence in sentences:
+        yield(gensim.utils.simple_preprocess
+              (str(sentence), deacc=True))  #deacc=True removes punctuations
+
 data_words = list(sent_to_words(data))
 print(data_words[:1])
 
 # Build the bigram and trigram models
+logger.info('Biggram initiated .')
 bigram = gensim.models.Phrases\
     (data_words, min_count=5, threshold=100) # higher threshold fewer phrases.
 trigram = gensim.models.Phrases(bigram[data_words], threshold=100)
@@ -65,15 +81,19 @@ print(trigram_mod[bigram_mod[data_words[0]]])
 
 # Define function for stopwords, bigrams, trigrams and lemmatization
 def remove_stopwords(texts):
+    logger.info('Remove Stop Words initiated .')
     return [[word for word in simple_preprocess(str(doc)) if word not in stop_words] for doc in texts]
 
 def make_bigrams(texts):
+    logger.info('make Biggrams initiated .')
     return [bigram_mod[doc] for doc in texts]
 
 def make_trigrams(texts):
+    logger.info('Trigrams initiated .')
     return [trigram_mod[bigram_mod[doc]] for doc in texts]
 
 def lemmatization(texts, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
+    logger.info('Lemmatization initiated .')
     """https://spacy.io/api/annotation"""
     texts_out = []
     for sent in texts:
@@ -85,6 +105,7 @@ def lemmatization(texts, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
 data_words_nostops = remove_stopwords(data_words)
 
 # Form Bigrams
+
 data_words_bigrams = make_bigrams(data_words_nostops)
 
 # Initialize spacy 'en' model, keeping only tagger component (for efficiency)

@@ -1,0 +1,6 @@
+{
+  "Environment" : "dev",
+  "DEBUG" : "True",
+  "LOG_ERRORS" : "TRUE",
+  "APPLOG" : "C:\\Users\\002CSC744\\Documents\\My_Projects\\JText-classifier_main\\log\\log.txt"
+}

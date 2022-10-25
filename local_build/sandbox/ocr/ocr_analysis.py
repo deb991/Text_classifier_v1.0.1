@@ -5,13 +5,20 @@ import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter
 from time import sleep
 import re
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s')
+logger = logging.getLogger(__name__)
 
 custom_config =  r'--oem 3 --psm 6'
+logger.info('Custom Config set to: --oem 3 --psm 6')
 ocr.pytesseract.tesseract_cmd = \
     'C:\\Tesseract-OCR\\tesseract.exe'
+logger.info('Py Tessaract executable path set. ')
 
 
 def detect_image_lang(image):
+    logger.info(' Image language recognization initiated. ')
     try:
         osd = ocr.image_to_osd(image)
         script = re.search("Script: ([a-zA-Z]+)\n", osd)[1]
@@ -19,10 +26,12 @@ def detect_image_lang(image):
         #print('Script:\t', script)
         return script, float(conf)
     except Exception:
+        logger.error(' Exception cause ended language detection. ')
         return None, 0.0
 
 
 def image_read(image):
+    logger.info('Test image read initiated. ')
     img = cv2.imread(image)
     raw_data = ocr.image_to_string(img, config=custom_config)
 
@@ -30,16 +39,19 @@ def image_read(image):
 
 
 def lang_classifier(arg1):
+    logger.info('Language Classifier from image text initiated. ')
     try:
         if arg1 == 'english':
             return 'eng'
         elif arg1 == 'Bengali':
             return 'ben'
     except:
+        logger.exception('Language classification exception!! ')
         print('Language detectection not happen!!')
 
 
 def image_read_lang(image):
+    logger.info('Lang classification basis read data initiated. ')
     script_name, confidence = detect_image_lang(image)
     get_lang = lang_classifier(script_name)
     im = Image.open(image)
@@ -48,16 +60,19 @@ def image_read_lang(image):
     im = enhancer.enhance(2)
     im = im.convert('1')
     text = ocr.image_to_string(Image.open(image), lang=get_lang)
-    print('Text_check:\t', text)
+    #print('Text_check:\t', text)
+    logger.info('Return language based data')
     return text
 
 
 def np_array_img(image):
+    logger.info('Numpy array conversion & return. ')
     np_image = np.array(Image.open(image))
     return np_image
 
 
 def get_greyscale(image):
+    logger.info(" 'greyscale' data of extracted image text. ")
     grey_img = cv2.cvtColor(np_array_img(image), cv2.COLOR_BGR2GRAY)
     cv2.imshow("Geay_Scale_window", grey_img)
     cv2.waitKey(30)
@@ -66,6 +81,7 @@ def get_greyscale(image):
 
 
 def get_noise_removal(image):
+    logger.info(' Noise removal initiated. ')
     noise_remove_img = cv2.medianBlur(np_array_img(image), 5)
     cv2.imshow("Noise_Removed_image", noise_remove_img)
     cv2.waitKey(30)
@@ -74,6 +90,7 @@ def get_noise_removal(image):
 
 
 def get_thresholding(image):
+    logger.info(' get threshold. ')
     float_img = np.random.random((4, 4))
     im = np.array(float_img * 255, dtype=np.uint8)
     threshed = cv2.adaptiveThreshold(im, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
@@ -87,25 +104,30 @@ def get_thresholding(image):
 
 
 def get_dialation_img(image):
+    logger.init(" get dialation of the inout image. ")
     kernel = np.ones((5, 5), np.uint8)
     return cv2.dilate(np_array_img(image), kernel, iterations=1)
 
 
 def get_erosion(image):
+    logger.info(' get Erossion of the inout image. ')
     kernel = np.ones((5, 5), np.uint8)
     return cv2.erode(np_array_img(image), kernel, iterations=1)
 
 
 def opening_image(image):
+    logger.info("Image open process initiated. ")
     kernel = np.ones((5, 5), np.uint8)
     return cv2.morphologyEx(np_array_img(image), cv2.MORPH_OPEN, kernel)
 
 
 def get_canny_edge(image):
+    logger.info('Canny Image initated. ')
     return cv2.Canny(np_array_img(image), 100, 200)
 
 
 def get_skew_correction(image):
+    logger.info(" Skew correction process initiated. ")
     coords = np.column_stack(np.where(image > 0))
     angle = cv2.minAreaRect(coords)[-1]
     if angle < -45:
@@ -124,10 +146,12 @@ def get_skew_correction(image):
 
 
 def get_match_template(image, template):
+    logger.info("Match template initiated. ")
     return cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
 
 
 def ocr_test(image):
+    logger.info(" OCR test initiated with inout function. ")
     script_name, confidence = detect_image_lang(image)
     #print(f'Script_Name: \t{script_name}, \nConfindence:\t{confidence}')
     image_read_lang(image)
